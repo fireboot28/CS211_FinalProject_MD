@@ -1,0 +1,554 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+import javax.swing.*;
+
+public class runGameCleaner{
+ 
+ public static DominoD dominoCenter, dominoLeft, dominoRight;
+ //public static HorizontalDomino hDominoLeft, hDominoRight;
+ public static GridBagConstraints left, right, center;
+ //public static int hitBoundaryLeft, hitBoundaryRight;
+ //public static GridBagConstraints handGrid;
+ public static boolean hitBoundaryLeft;
+ public static boolean hitBoundaryRight;
+ public static int numDominosPlayed = 0;
+ public static int numLeft;
+ public static int numRight;
+ public static boolean order; //true means player goes first, false means ai goes first
+ public static boolean played = false; //true means player just played a domino, false means player has yet to play a domino
+ public static boolean aiPlayed = false; //true means ai just played a domino, false means ai has yet to play a domino
+ public static GridBagConstraints handGrid = new GridBagConstraints();
+
+ public static void main(String[] args) {
+  // TODO Address object width and spacing... increase domino cell width to 4 for horizontal and 2 for vertical is current idea
+
+  left = new GridBagConstraints();
+  left.gridx = 5;
+ // left.gridwidth = 4;
+  left.gridy = 5;
+
+  right = new GridBagConstraints();
+  right.gridx = 5;
+ // right.gridwidth = 4;
+     right.gridy = 5;  
+  
+  center = new GridBagConstraints();
+  center.gridx = 5;
+  center.gridy = 5; 
+ // center.gridwidth = 2;
+
+  
+  JFrame frame = new JFrame("Dominos");
+  frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  frame.setVisible(true);
+  frame.setSize(1280, 720);;
+  //frame.setResizable(false);
+
+  JPanel uiLayout = new JPanel((new BorderLayout()));
+  JPanel board = new JPanel(new GridBagLayout());
+  JPanel hand = new JPanel(new GridBagLayout());
+  //hand.setPreferredSize(new Dimension( 200, 200));
+  
+  
+  JPanel above = new JPanel();
+  JLabel testTitle = new JLabel("Domino Game", JLabel.CENTER);
+  above.add(testTitle);
+  
+  JPanel menuPanel = new JPanel();
+  JLabel testInfo = new JLabel("Information", JLabel.CENTER);
+  menuPanel.add(testInfo);
+  
+  uiLayout.add(above, BorderLayout.NORTH);
+  uiLayout.add(menuPanel, BorderLayout.EAST);//holds instructions, static score, possibly other buttons. unrelated note, popups when game end
+  uiLayout.add(board, BorderLayout.CENTER);
+  uiLayout.add(hand, BorderLayout.SOUTH);
+  
+  frame.add(uiLayout);
+  //frame created, panel added to frame, items added to panel
+ 
+  //we need a layout manager; to display components or
+  
+  DeckD total = new DeckD();
+  int size = total.getBoneyard().size();
+  DeckD player =  new DeckD(true); //empty initially
+  DeckD ai = new DeckD(true); //empty initially
+  
+  for(int i = 0; i < size / 2; i++) {
+ //  playDomino(player.getPiece(), hand, board);
+     player.getBoneyard().add(total.getPiece());
+     ai.getBoneyard().add(total.getPiece());
+  }
+  System.out.println("Player " + player.toString());
+  System.out.println("AI " + ai.toString());
+  playFirst(player, ai, hand, board);
+  
+  System.out.println(order); 
+  for(DominoD d : player.getBoneyard()){
+     hand.add(d);
+   }
+  
+  for(DominoD d: player.getBoneyard()){
+          playDomino(player, d, hand, board, ai);
+  }
+  frame.pack();
+  /*while(numDominosPlayed < 28){
+    System.out.println("Player played = " + played);
+    if(played == true){
+      aiPlay(ai, hand, board);
+      played = false;
+      continue;
+    }
+  }*/
+  frame.pack();
+}
+ 
+ 
+/* public static boolean winner(DeckD d1, DeckD d2){
+   if(d1.getBoneyard.getSize() == 0 || */
+
+ //gets the 6/6 piece from whichever deck has it (either ai or player) and places it on the board.
+ public static void playFirst(DeckD d1, DeckD d2, JPanel hand, JPanel board){ 
+   for(DominoD d : d1.getBoneyard()){
+     if(d.getNum1() == 6 && d.getNum2() == 6){
+       reposition(d, hand, board, center);
+       dominoCenter = d;
+       d1.remove(d);
+       order = true;
+       return;
+     }
+   }
+   for(DominoD d : d2.getBoneyard()){
+     if(d.getNum1() == 6 && d.getNum2() == 6){
+       reposition(d, hand, board, center);
+       dominoCenter = d;
+       d2.remove(d);
+       order = false;
+       return;
+     }
+   }
+ }
+ //maybe make hand and board public static
+ 
+ //transfers domino objects from panels
+ public static void reposition(DominoD domino, JPanel hand, JPanel board, GridBagConstraints lcr) {
+  
+         //default orientation checked
+        if(!domino.isDouble()) {
+         domino.changeOrientation();
+        }
+  
+  System.out.println(domino.getNum1()+ "|" + domino.getNum2() + " is being repositioned at grid: " + lcr.gridx + ", " + lcr.gridy);
+  
+    domino.resize(); //resized to correct orientation and dimension
+     board.add(domino, lcr); //use if statements to determine left or right 
+     hand.remove(domino);//hand loses the domino
+
+     hand.revalidate();
+     hand.repaint();
+     domino.setIsPlayed();
+ }
+ 
+ public static void playDomino(DeckD deck, DominoD domino, JPanel hand, JPanel board, DeckD ai) {
+  domino.setBackground(Color.WHITE);
+  hand.add(domino);//domino is added to the hand layout with constraints
+
+  domino.addActionListener(new ActionListener(){ //attaches and action listener to the domino  
+   public void actionPerformed(ActionEvent e){
+    
+    //checks if domino is already on the board; maybe change name convention of method
+    if(domino.getIsPlayed()) {
+     System.out.println("Values: " + "|" + domino.getNum1() + "|" + domino.getNum2() + "|");
+        deck.remove(domino);
+         return;
+    }
+    /* if center is null, left and right must be null
+     * if center is initialized, but left isnt, must check if domino can be attached to center side(right)
+     * if center and left is initialized, must check right and left, prioritize uninitialized side
+     */
+    //condition: center domino has not been placed;
+          if(dominoCenter == null) {
+           if(domino.isDouble()) {
+            dominoCenter = domino; 
+            System.out.println(domino.getNum1() + "|" + domino.getNum2() + " placed!");
+            reposition(domino, hand, board, center);
+            numDominosPlayed++;
+            played = true;
+            System.out.println(played);
+            deck.remove(domino);
+            return;
+           }else {
+            System.out.println("Error: domino is not a double; Cannot be placed as center!");
+            return;//quit 
+           }
+           //center is initialized
+          }else if(dominoLeft == null ) {
+           if(domino.getNum1() == dominoCenter.getNum2() || domino.getNum2() == dominoCenter.getNum2()) {
+            //rotate domino to mate correct numbers
+            if(domino.getNum1() == dominoCenter.getNum2()) {
+             domino.rotate180();
+            }
+            dominoLeft = domino; 
+            numLeft++;
+            checkGridBoundary(domino, dominoLeft , left);
+            reposition(domino, hand, board, left);
+            numDominosPlayed++;
+            played = true;
+            System.out.println(played);
+            deck.remove(domino);
+            aiPlay(ai, hand, board);
+            return;
+           //TODO need to check if domino will be immediately removed changing values
+           }
+           //checking right side if it exists
+           else if((dominoRight != null) && (domino.getNum1() == dominoRight.getNum2() || domino.getNum2() == dominoRight.getNum2())){
+            if(domino.getNum2() == dominoRight.getNum2()) {
+             domino.rotate180();
+            }
+            dominoRight = domino;
+            numRight++;
+            checkGridBoundary(domino, dominoRight , right);
+            reposition(domino, hand, board, right);
+            numDominosPlayed++;
+            played = true;
+            System.out.println(played);
+            deck.remove(domino);
+            aiPlay(ai, hand, board);
+            return;
+           }
+           else {
+            System.out.println(domino.getNum1() + "|" + domino.getNum2() + " cannot be placed to the left of the center!");
+            return;
+           }
+           //left and center initialized
+          }else if (dominoRight == null) {
+           if(domino.getNum1() == dominoCenter.getNum2() || domino.getNum2() == dominoCenter.getNum2() ) {
+            if(domino.getNum2() == dominoCenter.getNum2()) {
+             domino.rotate180();
+            }
+            dominoRight = domino;
+            numRight++;
+            checkGridBoundary(domino, dominoRight , right);
+            reposition(domino, hand, board, right);
+            numDominosPlayed++;
+            played = true;
+            System.out.println(played);
+            deck.remove(domino);
+            aiPlay(ai, hand, board);
+            return;
+           //checking left 
+           }else if((domino.getNum1() == dominoLeft.getNum1() || domino.getNum2() == dominoLeft.getNum1())){
+            if(domino.getNum1() == dominoLeft.getNum1()) {
+             domino.rotate180();
+            }
+            dominoLeft = domino;
+            numLeft++;
+            checkGridBoundary(domino, dominoLeft , left);
+            reposition(domino, hand, board, left);
+            numDominosPlayed++;
+            played = true;
+            System.out.println(played);
+            deck.remove(domino);
+            aiPlay(ai, hand, board);
+            return;
+           }
+          }else {//both ends(and center) initialized
+           System.out.println("Left End: " + dominoLeft.getNum1() + " Right End: " + dominoRight.getNum2());
+           
+           //priority check to the side with less dominoes. Checks both left and right side domino ends
+           if(numLeft <= numRight) {
+            if((domino.getNum1() == dominoLeft.getNum1() || domino.getNum2() == dominoLeft.getNum1())){
+             if(domino.getNum1() == dominoLeft.getNum1()) {
+              domino.rotate180();
+             }
+             dominoLeft = domino;
+             numLeft++;
+             checkGridBoundary(domino, dominoLeft , left);
+             reposition(domino, hand, board, left);
+             numDominosPlayed++;
+             played = true;
+             System.out.println(played);
+             deck.remove(domino);
+             aiPlay(ai, hand, board);
+             return;
+            }
+            if (domino.getNum1() == dominoRight.getNum2() || domino.getNum2() == dominoRight.getNum2()){
+             if(domino.getNum2() == dominoRight.getNum2()) {
+              domino.rotate180();
+             }
+             dominoRight = domino;
+             numRight++;
+             checkGridBoundary(domino, dominoRight , right);
+             reposition(domino, hand, board, right);
+             numDominosPlayed++;
+             played = true;
+             System.out.println(played);
+             deck.remove(domino);
+             aiPlay(ai, hand, board);
+             return;
+            }
+           }
+           else {
+            if (domino.getNum1() == dominoRight.getNum2() || domino.getNum2() == dominoRight.getNum2()){
+             if(domino.getNum2() == dominoRight.getNum2()) {
+              domino.rotate180();
+             }
+             dominoRight = domino;
+             numRight++;
+             checkGridBoundary(domino, dominoRight , right);
+             reposition(domino, hand, board, right);
+             numDominosPlayed++;
+             played = true;
+             System.out.println(played);
+             deck.remove(domino);
+             aiPlay(ai, hand, board);
+             return;
+            }
+            if((domino.getNum1() == dominoLeft.getNum1() || domino.getNum2() == dominoLeft.getNum1())){
+             if(domino.getNum1() == dominoLeft.getNum1()) {
+              domino.rotate180();
+             }
+             dominoLeft = domino;
+             numLeft++;
+             checkGridBoundary(domino, dominoLeft , left);
+             reposition(domino, hand, board, left);
+             numDominosPlayed++;
+             played = true;
+             System.out.println(played);
+             deck.remove(domino);
+             aiPlay(ai, hand, board);
+             return;
+            }
+            
+           }
+
+   }
+   }
+private void checkGridBoundary(DominoD domino, DominoD leftOrRight, GridBagConstraints lcr) {
+     if(leftOrRight == dominoLeft) {
+    if(lcr.gridx >= 0 && lcr.gridy == 2) {
+     lcr.gridx++;
+     //TODO instead use 2 methods, 1 for left 2 direction, 1 for right 2nd direction FIX THIS
+ 
+    // domino.rotate180();
+    // dominoLeft = domino;
+    }else if(lcr.gridx == 0) {
+     
+     domino.changeOrientation();
+     lcr.gridy--;
+    }else {
+     System.out.println("Default: going left");
+     lcr.gridx--;
+    }
+      }
+     else if(leftOrRight == dominoRight) {
+    if( lcr.gridx <= 10 && lcr.gridy == 8) {
+     lcr.gridx--;
+          
+    }else if(lcr.gridx == 10) {
+
+     domino.changeOrientation();
+     lcr.gridy++;
+    }
+    else {
+     System.out.println("Default: going right");
+     lcr.gridx++;
+    }
+     }
+      
+    
+   }
+      });
+ 
+
+ 
+ }
+ 
+ //would be in deckgame
+ public void draw(ArrayList<DominoD> hand, DeckD boneyard, int amount) {
+  for (int i = 0; i < amount; i++) {
+   hand.add(boneyard.getPiece());
+  }
+ }
+ 
+ public static void aiPlay(DeckD deck, JPanel hand, JPanel board){
+
+   for(DominoD domino : deck.getBoneyard()){
+    // if(aiPlayed == false){
+    /* if center is null, left and right must be null
+     * if center is initialized, but left isnt, must check if domino can be attached to center side(right)
+     * if center and left is initialized, must check right and left, prioritize uninitialized side
+     */
+    
+          if(dominoLeft == null ) {
+           if(domino.getNum1() == dominoCenter.getNum2() || domino.getNum2() == dominoCenter.getNum2()) {
+            //rotate domino to mate correct numbers
+            if(domino.getNum1() == dominoCenter.getNum2()) {
+             domino.rotate180();
+            }
+            dominoLeft = domino; 
+            numLeft++;
+            aiCheckGridBoundary(domino, dominoLeft , left);
+            reposition(domino, hand, board, left);
+            numDominosPlayed++;
+            deck.remove(domino);
+            aiPlayed = true;
+            break;
+           //TODO need to check if domino will be immediately removed changing values
+           }
+           //checking right side if it exists
+           else if((dominoRight != null) && (domino.getNum1() == dominoRight.getNum2() || domino.getNum2() == dominoRight.getNum2())){
+            if(domino.getNum2() == dominoRight.getNum2()) {
+             domino.rotate180();
+            }
+            dominoRight = domino;
+            numRight++;
+            aiCheckGridBoundary(domino, dominoRight , right);
+            reposition(domino, hand, board, right);
+            numDominosPlayed++;
+            deck.remove(domino);
+            aiPlayed = true;
+            break;
+           }
+           else {
+            System.out.println(domino.getNum1() + "|" + domino.getNum2() + " cannot be placed to the left of the center!");
+            return;
+           }
+           //left and center initialized
+          }else if (dominoRight == null) {
+           if(domino.getNum1() == dominoCenter.getNum2() || domino.getNum2() == dominoCenter.getNum2() ) {
+            if(domino.getNum2() == dominoCenter.getNum2()) {
+             domino.rotate180();
+            }
+            dominoRight = domino;
+            numRight++;
+            aiCheckGridBoundary(domino, dominoRight , right);
+            reposition(domino, hand, board, right);
+            numDominosPlayed++;
+            deck.remove(domino);
+            aiPlayed = true;
+            break;
+           //checking left 
+           }else if((domino.getNum1() == dominoLeft.getNum1() || domino.getNum2() == dominoLeft.getNum1())){
+            if(domino.getNum1() == dominoLeft.getNum1()) {
+             domino.rotate180();
+            }
+            dominoLeft = domino;
+            numLeft++;
+            aiCheckGridBoundary(domino, dominoLeft , left);
+            reposition(domino, hand, board, left);
+            numDominosPlayed++;
+            deck.remove(domino);
+            aiPlayed = true;
+            break;
+           }
+          }else {//both ends(and center) initialized
+           System.out.println("Left End: " + dominoLeft.getNum1() + " Right End: " + dominoRight.getNum2());
+           
+           //priority check to the side with less dominoes. Checks both left and right side domino ends
+           if(numLeft <= numRight) {
+            if((domino.getNum1() == dominoLeft.getNum1() || domino.getNum2() == dominoLeft.getNum1())){
+             if(domino.getNum1() == dominoLeft.getNum1()) {
+              domino.rotate180();
+             }
+             dominoLeft = domino;
+             numLeft++;
+             aiCheckGridBoundary(domino, dominoLeft , left);
+             reposition(domino, hand, board, left);
+             numDominosPlayed++;
+             deck.remove(domino);
+             aiPlayed = true;
+             break;
+            }
+            if (domino.getNum1() == dominoRight.getNum2() || domino.getNum2() == dominoRight.getNum2()){
+             if(domino.getNum2() == dominoRight.getNum2()) {
+              domino.rotate180();
+             }
+             dominoRight = domino;
+             numRight++;
+             aiCheckGridBoundary(domino, dominoRight , right);
+             reposition(domino, hand, board, right);
+             numDominosPlayed++;
+             deck.remove(domino);
+             aiPlayed = true;
+             break;
+            }
+           }
+           else {
+            if (domino.getNum1() == dominoRight.getNum2() || domino.getNum2() == dominoRight.getNum2()){
+             if(domino.getNum2() == dominoRight.getNum2()) {
+              domino.rotate180();
+             }
+             dominoRight = domino;
+             numRight++;
+             aiCheckGridBoundary(domino, dominoRight , right);
+             reposition(domino, hand, board, right);
+             numDominosPlayed++;
+             deck.remove(domino);
+             aiPlayed = true;
+             break;
+            }
+            if((domino.getNum1() == dominoLeft.getNum1() || domino.getNum2() == dominoLeft.getNum1())){
+             if(domino.getNum1() == dominoLeft.getNum1()) {
+              domino.rotate180();
+             }
+             dominoLeft = domino;
+             numLeft++;
+             aiCheckGridBoundary(domino, dominoLeft , left);
+             reposition(domino, hand, board, left);
+             numDominosPlayed++;
+             deck.remove(domino);
+             aiPlayed = true;
+             break;
+            }
+            
+           }
+
+   }
+   
+   //  }  
+   /*  else{
+       return;
+     }*/
+ }
+   aiPlayed = true; //if method reaches here, it's because ai had nothing to play
+   return;
+ }
+ public static void aiCheckGridBoundary(DominoD domino, DominoD leftOrRight, GridBagConstraints lcr){
+     if(leftOrRight == dominoLeft) {
+      if(lcr.gridx >= 0 && lcr.gridy == 2) {
+       lcr.gridx++;
+     //TODO instead use 2 methods, 1 for left 2 direction, 1 for right 2nd direction FIX THIS
+ 
+    // domino.rotate180();
+    // dominoLeft = domino;
+    }else if(lcr.gridx == 0) {
+     
+     domino.changeOrientation();
+     lcr.gridy--;
+    }else {
+     System.out.println("Default: going left");
+     lcr.gridx--;
+    }
+      }
+     else if(leftOrRight == dominoRight) {
+    if( lcr.gridx <= 10 && lcr.gridy == 8) {
+     lcr.gridx--;
+          
+    }else if(lcr.gridx == 10) {
+
+     domino.changeOrientation();
+     lcr.gridy++;
+    }
+    else {
+     System.out.println("Default: going right");
+     lcr.gridx++;
+    }
+     }
+      
+    
+   }
+
+ 
+}

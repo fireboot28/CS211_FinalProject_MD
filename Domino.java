@@ -1,0 +1,146 @@
+//Domino class - represents a single domino
+import java.awt.*; //needed for action listener methods
+import javax.swing.*; //needed for GUI
+import java.awt.event.*;
+public class Domino extends JButton{ 
+  private int num1, num2;
+  private int length = 60;
+  private int width = 120; 
+  private Point p;
+  private int resizeFactor = 1; //determine the spacing of domino dots
+  private int dotSize = 15; //size of Domino dots
+  private boolean isPlayed = false;
+ 
+  public Domino(int num1, int num2, int x, int y){ //constructor
+    this.num1 = num1;
+    this.num2 = num2;
+    this.p = new Point(x, y); //holds top-left coordinate of the domino
+    setBounds((int)p.getX(), (int)p.getY(), this.length, this.width);
+    setBackground(Color.WHITE);
+  }
+  
+  public void paintComponent(Graphics g){ //paint method from JPanel
+    super.paintComponent(g);
+    g.setColor(Color.BLACK);
+    g.drawRect(0, 0, length, width); 
+    g.drawLine(0, length, length, length); //length is also y-coordinate since lenght is 1/2 width
+    //if num1 || num2 is zero, then that respective domino square is blank
+    if(num1 == 1){
+      g.fillOval(23 / resizeFactor, 25 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 2){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 3){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(23 / resizeFactor, 25 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 4){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 5){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+      g.fillOval(23 / resizeFactor, 25 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 6){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 23 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 23 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    if(num2 == 1){
+      g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 2){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 3){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 4){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 5){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+      g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 6){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 83 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 83 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    } 
+  }
+  
+  
+  public void resize(Point p){
+    if(this.isPlayed == false){
+      this.length /= 2;
+      this.width /= 2;
+      this.dotSize /= 2;
+      this.p = p;
+      setBounds((int)this.p.getX(), (int)this.p.getY(), this.length, this.width);
+      this.resizeFactor = 2;
+      repaint(); //calls paintComponent() method again
+      if(this.num1 == this.num2){
+        isPlayed = true;
+      }
+    }
+  }
+  
+  public int getNum1(){
+    return this.num1;
+  }
+  
+  public int getNum2(){
+    return this.num2;
+  }
+  
+  public int getX(){
+    return (int)this.p.getX();
+  }
+  
+  public int getY(){
+    return (int)this.p.getY();
+  }
+  
+  public boolean isDouble(){
+    if(this.getNum1() == this.getNum2()){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  
+  public boolean getIsPlayed(){
+    return this.isPlayed;
+  }
+  
+  public void setIsPlayed(){
+    this.isPlayed = true;
+  }
+  
+  
+}

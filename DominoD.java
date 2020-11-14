@@ -1,0 +1,390 @@
+   
+ import java.awt.*;
+ import javax.swing.*;
+
+
+public class DominoD extends JButton{
+
+private int num1, num2, x, y;
+private boolean isPlayed = false;
+private boolean vertical = true;
+//public boolean isResized = false; //TODO temporary. resize is called twice for some reason check runGame and Domino /debug
+  private int length = 60;
+  private int width = 120; 
+//  private Point p;
+  private int resizeFactor = 1; //determine the spacing of domino dots
+  private int dotSize = 15; //size of Domino dots
+ 
+  public DominoD(int num1, int num2, int x, int y){ //constructor
+    this.num1 = num1;
+    this.num2 = num2;
+    //this.p = new Point(x, y); //holds top-left coordinate of the domino
+   // setBounds((int)p.getX(), (int)p.getY(), this.length, this.width);
+    setPreferredSize(new Dimension(length , width));
+    setBackground(Color.WHITE);
+    
+  }
+  
+  public DominoD(int num1, int num2){ //constructor
+     this.num1 = num1;
+     this.num2 = num2;
+     //this.p = new Point(x, y); //holds top-left coordinate of the domino
+    // setBounds((int)p.getX(), (int)p.getY(), this.length, this.width);
+     setPreferredSize(new Dimension(length , width));
+     setBackground(Color.WHITE);
+   }
+  
+  public void paintComponent(Graphics g){ //paint method from JPanel
+    super.paintComponent(g);
+    
+    g.setColor(Color.BLACK);
+   //TODO System.out.println(this.getNum1() +"|" + this.getNum2() + " is vertical? " + vertical);
+//if num1 || num2 is zero, then that respective domino square is blank
+ if(vertical) {
+   g.drawRect(0, 0, length, width); 
+   g.drawLine(0, length, length, length); //length is also y-coordinate since lenght is 1/2 width
+   
+/*  if(num1 == 1){
+    g.fillOval(23 / resizeFactor, 25 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num1 == 2){
+    g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num1 == 3){
+    g.fillOval(5, y + 5, dotSize, dotSize);
+    g.fillOval(x + 23, y + 25, dotSize, dotSize);
+    g.fillOval(x + 40, y + 40, dotSize, dotSize);
+  }
+  else if(num1 == 4){
+    g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+    g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num1 == 5){
+    g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+    g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    g.fillOval(23 / resizeFactor, 25 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num1 == 6){
+    g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+    g.fillOval(5 / resizeFactor, 23 / resizeFactor, dotSize, dotSize);
+    g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 23 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+  }
+  if(num2 == 1){
+    g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num2 == 2){
+    g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num2 == 3){
+    g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+    g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num2 == 4){
+    g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+    g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num2 == 5){
+    g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+    g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+  }
+  else if(num2 == 6){
+    g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+    g.fillOval(5 / resizeFactor, 83 / resizeFactor, dotSize, dotSize);
+    g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 83 / resizeFactor, dotSize, dotSize);
+    g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+  } */
+   if(num1 == 1){
+      g.fillOval(23 / resizeFactor, 25 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 2){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 3){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(23 / resizeFactor, 25 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 4){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 5){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+      g.fillOval(23 / resizeFactor, 25 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num1 == 6){
+      g.fillOval(5 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 23 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 5 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 23 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 40 / resizeFactor, dotSize, dotSize);
+    }
+    if(num2 == 1){
+      g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 2){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 3){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 4){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 5){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+      g.fillOval(23 / resizeFactor, 85 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    }
+    else if(num2 == 6){
+      g.fillOval(5 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 83 / resizeFactor, dotSize, dotSize);
+      g.fillOval(5 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 65 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 83 / resizeFactor, dotSize, dotSize);
+      g.fillOval(40 / resizeFactor, 100 / resizeFactor, dotSize, dotSize);
+    } 
+  
+ }
+ else {
+   g.drawRect(0, 0, length, width); 
+      g.drawLine(30, 0, 30, width);
+      
+      if(this.num1 == 1){
+        g.fillOval(11, 12, dotSize, dotSize);
+      }
+      else if(this.num1 == 2){
+        g.fillOval(2, 2, dotSize, dotSize);
+        g.fillOval(20, 20, dotSize, dotSize);
+      }
+      else if(this.num1 == 3){
+        g.fillOval(2, 2, dotSize, dotSize);
+        g.fillOval(11, 12, dotSize, dotSize);
+        g.fillOval(20, 20, dotSize, dotSize);
+      }
+      else if(this.num1 == 4){
+        g.fillOval(2, 2, dotSize, dotSize);
+        g.fillOval(20, 20, dotSize, dotSize);
+        g.fillOval(2, 20, dotSize, dotSize);
+        g.fillOval(20, 2, dotSize, dotSize);
+      }
+      else if(this.num1 == 5){
+        g.fillOval(2, 2, dotSize, dotSize);
+        g.fillOval(20, 20, dotSize, dotSize);
+        g.fillOval(2, 20, dotSize, dotSize);
+        g.fillOval(20, 2, dotSize, dotSize);
+        g.fillOval(11, 12, dotSize, dotSize);
+      }
+      else if(this.num1 == 6){
+        g.fillOval(2, 2, dotSize, dotSize);
+        g.fillOval(20, 20, dotSize, dotSize);
+        g.fillOval(2, 20, dotSize, dotSize);
+        g.fillOval(20, 2, dotSize, dotSize);
+        g.fillOval(11, 2, dotSize, dotSize);
+        g.fillOval(11, 20, dotSize, dotSize);
+      }
+      if(this.num2 == 1){
+        g.fillOval(41, 12, dotSize, dotSize);
+      }
+      else if(this.num2 == 2){
+        g.fillOval(32, 2, dotSize, dotSize);
+        g.fillOval(50, 20, dotSize, dotSize);
+      }
+      else if(this.num2 == 3){
+        g.fillOval(32, 2, dotSize, dotSize);
+        g.fillOval(41, 12, dotSize, dotSize);
+        g.fillOval(50, 20, dotSize, dotSize);
+      }
+      else if(this.num2 == 4){
+        g.fillOval(32, 2, dotSize, dotSize);
+        g.fillOval(50, 20, dotSize, dotSize);
+        g.fillOval(32, 20, dotSize, dotSize);
+        g.fillOval(50, 2, dotSize, dotSize);
+      }
+      else if(this.num2 == 5){
+        g.fillOval(32, 2, dotSize, dotSize);
+        g.fillOval(50, 20, dotSize, dotSize);
+        g.fillOval(32, 20, dotSize, dotSize);
+        g.fillOval(50, 2, dotSize, dotSize);
+        g.fillOval(41, 12, dotSize, dotSize);
+      }
+      else if(this.num2 == 6){
+        g.fillOval(32, 2, dotSize, dotSize);
+        g.fillOval(50, 20, dotSize, dotSize);
+        g.fillOval(32, 20, dotSize, dotSize);
+        g.fillOval(50, 2, dotSize, dotSize);
+        g.fillOval(41, 2, dotSize, dotSize);
+        g.fillOval(41, 20, dotSize, dotSize);
+      }
+ } 
+  
+  }
+  
+  //need to adjust, dots and pixels have issues, may need to add a set of dot dimensions ...will be a pain if that is the solution
+ /* public void resize(){
+    this.length = (int) ((int) this.length/1.3);
+    this.width = (int) ((int) this.width/1.3);
+    this.dotSize = (int) ((int)this.dotSize/1.5);
+   /* setBounds(0, 100, this.length, this.width);
+    this.p.move(0, 100);
+    this.resizeFactor = 2;
+    //setRotate(90);
+    repaint(); //calls paintComponent() method again
+    
+  }*/
+  public void resize() {
+  /* if(isResized) {
+    return;
+   }*/
+ /*  if(this.getNum1() == this.getNum2()) {
+    
+   }*/
+   this.dotSize /= 2;
+   
+   if(vertical) {
+    System.out.println(this.getNum1() + "|" + this.getNum2() + " is vertical");
+   this.length /= 2;
+   this.width /= 2;
+   this.resizeFactor = 2;
+  }
+   //is horizontal
+   else if(!vertical) {
+ //   System.out.println(this.getNum1() + "|" + this.getNum2() + " is horizontal");
+    this.length = 60;
+    this.width = 30;
+   }
+ //  System.out.println("Resize L: " + length + "W: " + width);
+   setPreferredSize(new Dimension(length , width));
+ //setPreferredSize(new Dimension(100 , 100)); TO CHECK FOR DOT PLACEMENT ONLY
+  // isResized = true;
+   repaint();
+   
+  }
+ /* public void resize(Point p) {
+   if(this.isPlayed == false) {
+    this.length /= 2;
+    this.width /= 2;
+    this.dotSize /=2;
+    this.p = p;
+    setBounds((int)p.getX(), (int)p.getY(), this.length, this.width);
+    this.resizeFactor = 2;
+    repaint();
+    if(this.num1 == this.num2) {
+     isPlayed = true;
+    }
+   }
+  }*/
+
+
+  //by default , is determined by double value
+public boolean isVertical() {
+ return vertical;
+}
+
+public void setVertical(boolean vertical) {
+  this.vertical = vertical;
+}
+
+//will override and flip the default verticallity of
+/*public void flip() {
+ resize();
+ this.setPreferredSize(length/2, width/2);
+} */
+
+public void changeOrientation() {
+ if(vertical) {
+  this.vertical = false;
+ }
+ else if(!vertical){
+  this.vertical = true;
+ }
+} 
+
+public int getNum1() {
+ return num1;
+}
+
+public int getNum2() {
+ return num2;
+}
+
+
+
+public void rotate180(int num2, int num1) {
+ this.num1 = num2;
+ this.num2 = num1;
+}
+
+public void rotate180() {
+ int temp = this.num1;
+ this.num1 = num2;
+ this.num2 = temp;
+}
+
+public int getDominoLength() {
+ return length;
+}
+
+public int getDominoWidth() {
+ return width;
+}
+
+public int getGridX() {
+ return x;
+}
+
+public int getGridY() {
+ return y;
+}
+
+public boolean isDouble() {
+ if(this.getNum1() == this.getNum2()) {
+  return true;
+ }
+ 
+ return false;
+}
+public boolean getIsPlayed() {
+ return isPlayed;
+}
+
+public void setIsPlayed() {
+ this.isPlayed = true;
+}
+public String toString() {
+ return this.getNum1() + " : " + this.getNum2() + " ";
+}
+
+}

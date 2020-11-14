@@ -1,0 +1,74 @@
+//David's tester
+import java.awt.*;
+import java.util.ArrayList;
+
+import javax.swing.*;
+
+public class davidRunGame{
+ public static void main(String[] args) {
+  // TODO Auto-generated method stub
+  JFrame frame = new JFrame("Dominos");
+  frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  frame.setVisible(true);
+  frame.setSize(400, 400);;
+  
+  JPanel board = new JPanel();
+  
+  frame.add(board);
+  //frame created, panel added to frame, items added to panel
+  //FlowLayout show = new FlowLayout();
+  GridBagLayout show = new GridBagLayout();
+  board.setLayout(show);//instead of board.setLayout(null);
+  //we need a layout manager; to display components or
+  Deck bone = new Deck(2);
+
+  Domino domino = new Domino(6, 6, 200, 100 );
+  Domino domino2 = new Domino(1, 2, 200, 100 );
+  Domino domino3 = new Domino(2, 3, 200, 100 );
+  Domino domino4 = new Domino(4, 5, 200, 100 );
+  Domino domino5 = new Domino(1, 3, 200, 100 );
+
+  
+  GridBagConstraints c = new GridBagConstraints();
+  c.fill = GridBagConstraints.HORIZONTAL;
+  c.ipadx = 25;      //make this component tall
+  c.ipady = 110;
+  c.weightx = 0.0; //specify scaling as window size increases
+  //c.gridwidth = 4; //specifies num of cells
+  c.gridheight = 8;
+  c.anchor = GridBagConstraints.PAGE_END;
+  c.gridy = c.gridheight;
+  int count = 0;
+  /*for(Domino dom: bone.getBoneyard()) {
+   board.add(dom, c);
+   count++;
+   if(count/7 == 1) {
+    count = 0;
+    c.gridy--;
+   }*/
+  
+  board.add(domino, c);
+  board.add(domino2, c);
+  //board.add(domino3, c);
+  //board.add(domino4, c);
+  //board.add(domino5, c);
+ // board.add(domino5);
+ // board.add(domino5);
+ // board.add(domino5);
+ // board.add(domino5);
+ // board.add(domino5);
+ // board.add(domino5);
+  //frame.add(domino);
+  
+ // domino.repaint();
+}
+  
+
+ //would be in deckgame
+ public void draw(ArrayList<Domino> hand, Deck boneyard, int amount) {
+  for (int i = 0; i < amount; i++) {
+   hand.add(boneyard.getPiece());
+  }
+ } 
+ 
+}
