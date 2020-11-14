@@ -1,0 +1,18 @@
+Progress.txt Text
+   Original Objective: Create a domino game with a single player, and an ai robot.
+   
+   Current Status: 
+     We have successfully created a Domino class (final version called “DominoD”) that extends the JButton component in Javax.swing. The domino can be accurately displayed in the GUI with dots numbering from 0-6, and the orientation can support both vertical and horizontal layouts of the DominoD object.
+
+     We have successfully created a Deck class that represents a hand of either the player or an ai. The Deck class contains multiple dominos for each player/bot.
+We have successfully created a runGame class (final version called “RunGameCleaner”) that contains the main method for actually running the game. This class randomly gives 14 of the 28 dominos to both a player and an ai. This class has methods to  automatically play the first domino (6/6) and allow the player to click on a domino in his/her hand and display it.
+The runGame class is able to determine if the player’s chosen domino can be played, and, if it can be played, remove that domino from the player’s hand and place it on the board (a JPanel).
+
+     The runGame class displays all the dominos the player has at the bottom of the screen, immediately plays a domino from the ai’s deck whenever the player plays, and is able to branch paths from the center (6/6) domino.
+
+   What we need to work on:
+     The way the runGame branches the dominos on the board vertically (that is, when a played domino reaches the end of the left or right side of the  GUI window) doesn’t properly format the branched dominos next to the dominos on the horizontal path.
+
+     We need to add text output (in the GUI) to let the player know when it’s his/her turn, and when the ai has played.
+
+     We need to add a method to check which participant won the game, and we need a method to check if the game ended in a stalemate (that is, if neither the player nor the ai can play their pieces).
